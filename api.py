@@ -1,12 +1,11 @@
 """ views models"""
 from models.sale_order.venta import saleOrder
+from models.sale_order_line import resources as rs_product
 from flask import Flask, jsonify, request
 from models import *
 from models import odoo
 
 """ import librery"""
-import datetime
-import time
 import config as cg
 
 #Global varial
@@ -29,14 +28,13 @@ def search_read():
 #Enviar a la ruta a traves de postman un json con el name el phone y el email
 def create():
     #capturo json
-    name = request.json['name']
-    rut = request.json['rut']
-    comment = request.json['comment']
-    phone = request.json['phone']
-    email = request.json['email']
-    crear = rs_partner.ResPartnerList.partner_create(name,rut,comment,phone,email)
+    data = request.get_json()
+    cliente = data["cliente"]
+    print(cliente)
+    
+    crear = rs_partner.ResPartnerList.partner_create(cliente)
     #y lo mando a su resource
-    return jsonify({'Creado':crear})
+    return crear
 
 @app.route("/partner/<id>", methods=["PUT"])
 def update_partner(id):
@@ -67,13 +65,19 @@ def create_venta(id):
     #Usar el metodo ya creado donde creamos un partner
     partners = rs_partner.ResPartnerList.ObtenerPartnerSegunID(id)
     if(len(partners)== 0):
-        return "Ese ID no existe"
+        idpatner = create()
+        print("se creo con ", idpatner)
     else:
-        #print(partners)
-        data = request.get_json()
-        saleOrder.order_create(data)
-        # rs_partner.ResPartnerList.ActualizarPartnerSegunID(id,data)
-        return jsonify({"creado?":data})
+        idpatner = id
+    data = request.get_json()
+    product = rs_product.sale_order_line.ObtenerProducto(data)
+    if(len(product)== 0):
+        return"No existe ese Producto"       
+    else:
+        order = data["venta"] 
+        saleOrder.order_create(order,idpatner)
+    
+    return jsonify({"creado":order})
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)

@@ -18,19 +18,19 @@ class ResPartnerList():
         return s_read
 
 
-    def partner_create(name,rut,comment,phone,email):
+    def partner_create(data):
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         id = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'create', 
             [{
-            'name': name,
-            'rut' : rut,
-            'comment' : comment,
-            'phone' : phone,
-            'email' : email
+            'name': data["name"],
+            'rut' : data["rut"],
+            'comment' : data["comment"],
+            'phone' : data["phone"],
+            'email' : data["email"]
             }])
         name = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'name_get', [[id]])
-        return name
+        return id
     
     def ObtenerPartnerSegunID(id):
 

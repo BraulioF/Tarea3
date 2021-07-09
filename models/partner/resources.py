@@ -17,8 +17,8 @@ class ResPartnerList():
             {'fields': ['name', 'country_id', 'comment'], 'limit': 5})
         return s_read
 
-
-    def partner_create(data):
+class ResPartnerCreate():
+    def post(data):
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         id = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'create', 
@@ -31,8 +31,8 @@ class ResPartnerList():
             }])
         name = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'name_get', [[id]])
         return id
-    
-    def ObtenerPartnerSegunID(id):
+class ResPartnerGetByID():    
+    def get_by_id(id):
 
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
@@ -43,14 +43,14 @@ class ResPartnerList():
             {'fields': ['rut', 'comment', 'phone','email']})
                        
         return result
-    
-    def ActualizarPartnerSegunID(id, data):
+class ResPartnerUpdate():   
+    def update_by_id(id, data):
 
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         #12148 frank
         #12165  don cangrejo
-        #12170
+        #12170  ??????
 
         models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'write', [[int(id)], 
         {
@@ -60,7 +60,8 @@ class ResPartnerList():
              'phone' : data['phone'],
              'email': data['email']
         }])
-    def EliminarSegunID(id):
+class ResPartnerDelete():
+    def delete_by_id(id):
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'unlink', [[int(id)]])

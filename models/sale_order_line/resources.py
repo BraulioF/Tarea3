@@ -9,10 +9,11 @@ class sale_order_line():
         line_create = data["producto"]
         id = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'sale.order.line', 'create', 
             [{
-                "default_code" : line_create["default_code"],           
+                #"default_code" : line_create["default_code"],           
                 "product_id" : line_create["product_id"],
                 "product_uom_qty": line_create["product_uom_qty"],
-                "price_unit": line_create["price_unit"]           
+                "price_unit": line_create["price_unit"],  
+                'order_id' : line_create["order_line"],      
             }])
 
             

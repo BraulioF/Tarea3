@@ -8,6 +8,7 @@ class saleOrder():
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         id = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'sale.order', 'create', 
+            
             [{
             'partner_id': idpatner,
             'team_id' : data['team_id'],
@@ -15,11 +16,11 @@ class saleOrder():
             'partner_shipping_id' : data['partner_shipping_id'],
             'payment_acquirer_id' : data['payment_acquirer_id'],
             'pricelist_id' : data['pricelist_id'],
-            'order_line' : data['order_line'],                     
+                              
             }])
 
-            
+        print("Quizas y solo Quizas esta sea la order_id", id)   
         name = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'sale.order', 'name_get', [[id]])
-        return name
+        return id
 
     

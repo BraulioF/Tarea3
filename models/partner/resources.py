@@ -1,5 +1,6 @@
 """ Module of res.partner odoo model """
 from ..auth import odoo 
+from flask import Flask, jsonify, request
 
 
 
@@ -18,11 +19,12 @@ class ResPartnerList():
         return s_read
 
 class ResPartnerCreate():
-    def post(data):
+    def post(data, partnerid):
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
-        id = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'create', 
+        models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'create', 
             [{
+            'id' : partnerid, 
             'name': data["name"],
             'rut' : data["rut"],
             'comment' : data["comment"],
@@ -30,21 +32,22 @@ class ResPartnerCreate():
             'email' : data["email"]
             }])
         name = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'res.partner', 'name_get', [[id]])
-        return id
+        return partnerid
 class ResPartnerGetByID():    
-    def get_by_id(id):
+    def get_by_rut(rut):
 
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
 
         result = models.execute_kw(odoo_client.db, uid, odoo_client.password,
                     'res.partner', 'search_read',
-                    [[['id','=',id]]],
-            {'fields': ['rut', 'comment', 'phone','email']})
+                    [[['rut','=',rut]]],
+            {'fields': ["id",'rut', 'comment', 'phone','email']})
+        
                        
         return result
 class ResPartnerUpdate():   
-    def update_by_id(id, data):
+    def update_by_id(rut, data):
 
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()

@@ -26,33 +26,37 @@ def search_read():
     return jsonify(partners)
 
 #Views parnter list
-@app.route("/partner/create", methods=["POST"])
+@app.route("/partner/create/<id>", methods=["POST"])
 #Enviar a la ruta a traves de postman un json con el name el phone y el email
-def create():
+def create(id):
     #capturo json
     data = request.get_json()
     cliente = data["cliente"]
-    print(cliente)
+    print(cliente,id)
     
-    crear = rs_partner.ResPartnerCreate.post(cliente)
+    crear = rs_partner.ResPartnerCreate.post(cliente,id)
     #y lo mando a su resource
     return crear
 
-@app.route("/partner/<id>", methods=["PUT"])
-def update_partner(id):
-
-    partners = rs_partner.ResPartnerGetByID.get_by_id(id)
+@app.route("/partner/", methods=["PUT"])
+def update_partner():
+    data = request.get_json()
+    cliente = data["cliente"] 
+    rut = cliente["rut"]
+    partners = rs_partner.ResPartnerGetByID.get_by_rut(rut)
+    first = partners[0]
+    print(first["id"])
     if(len(partners)== 0):
-        return "Ese ID no existe"
+        return "Ese RUT no existe"
     else:
         #print(partners)
-        data = request.get_json()
-        rs_partner.ResPartnerUpdate.update_by_id(id,data)
+        
+        #rs_partner.ResPartnerUpdate.update_by_id(id,data)
         return jsonify(partners)
 
 @app.route("/partner/drop/<id>", methods=["DELETE"])
 def drop_partner(id):    
-    partners = rs_partner.ResPartnerGetByID.get_by_id(id)
+    partners = rs_partner.ResPartnerGetByID.get_by_rut(id)
     if(len(partners)== 0):
         return "Ese ID no existe"
     else:
@@ -62,67 +66,58 @@ def drop_partner(id):
         return jsonify(verificar)
 
 #POST A VENTAS
-# @app.route("/venta/<id>", methods=["POST"])
-# def create_venta(id):
-#     #Usar el metodo ya creado donde creamos un partner
-#     partners = rs_partner.ResPartnerGetByID.get_by_id(id)
-#     data = request.get_json()
-#     if(len(partners)== 0):
-#         cliente = data["cliente"]    
-#         rs_partner.ResPartnerCreate.post(cliente)
-#         idpatner = create()
-#         print("se creo con ", idpatner)
-#     else:
-#         idpatner = id
+@app.route("/venta", methods=["POST"])
+def create_venta():
+    #Usar el metodo ya creado donde creamos un partner
+    data = request.get_json()
+    cliente = data["cliente"] 
+    rut = cliente["rut"]
+    partners = rs_partner.ResPartnerGetByID.get_by_rut(rut)
+    if(len(partners)== 0):           
+        crear = rs_partner.ResPartnerCreate.post(cliente)
+        idpatner = crear
+        print("se creo con ", crear)
+    else:
+        first = partners[0]
+        idpatner = first["id"]
     
-#     product = ResProductGet.get_default_code(data)
-#     if(len(product)== 0):
-#         return"No existe ese Producto"       
-#     else:
-#         order = data["venta"] 
-#         saleOrder.order_create(order,idpatner)
-#         order_line = data["producto"]
-#         #rs_product.sale_order_line.order_line_create(order_line)
+    product = ResProductGet.get_default_code(data)
+    if(len(product)== 0):
+        return"No existe ese Producto"       
+    else:
+        order = data["venta"] 
+        order_id = saleOrder.order_create(order,idpatner)
+        order_line = data["producto"]
+        rs_product.sale_order_line.order_line_create(order_line,order_id)
     
     return jsonify({"creado":order_line})
-@app.route("/venta/<id>", methods=["POST"])
-def create_venta(id):
-    #Usar el metodo ya creado donde creamos un partner
-    #partners = rs_partner.ResPartnerGetByID.get_by_id(id)
-    data = request.get_json()    
-    #order_line = data['producto']
-    #print(order_line)
-    rs_product.sale_order_line.order_line_create(data)
-    
-    return jsonify({"creado":data})
+
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
 
-    {
-  "cliente":{
-            "name": "Don Bosco",
-            "rut" : "2222-2",
-            "comment" : "Sin comentarios",
-            "phone" : "555666777888",
-            "email" : "donbosco@gmail.com"
-  },
-  "venta":{           
-            "team_id" : "1",
-            "partner_invoice_id" : "12148",
-            "partner_shipping_id" : "12148",
-            "payment_acquirer_id" : "2",
-            "pricelist_id" : "1",
-            "order_line" : "16899"                       
-  },
-  "producto":{    
-            "default_code" : "20325",
-            "order_line" : "7047",
-            "order_id" : "",
-            "order_partner_id" : "1363",               
-            "product_id" : "10307",
-            "product_uom_qty": "12",
-            "price_unit": "1500"
-  }
+# {
+#   "cliente":{
+#             "name": "Varian Wrynn",
+#             "rut" : "99999-9",
+#             "comment" : "Sin comentarios",
+#             "phone" : "555666777888",
+#             "email" : "kigvarian@gmail.com"
+#   },
+#   "venta":{           
+#             "team_id" : "1",
+#             "partner_invoice_id" : "12148",
+#             "partner_shipping_id" : "12148",
+#             "payment_acquirer_id" : "2",
+#             "pricelist_id" : "1"
+                                  
+#   },
+#   "producto":{    
+#             "default_code" : "01005005",             
+#             "product_id" : "7162",
+#             "product_uom_qty": "12",
+#             "price_unit": "1500"
+#   }
          
-}
+# }

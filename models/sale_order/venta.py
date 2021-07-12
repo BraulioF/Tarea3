@@ -15,8 +15,7 @@ class saleOrder():
             'partner_invoice_id' : data['partner_invoice_id'],
             'partner_shipping_id' : data['partner_shipping_id'],
             'payment_acquirer_id' : data['payment_acquirer_id'],
-            'pricelist_id' : data['pricelist_id'],
-                              
+            'pricelist_id' : data['pricelist_id'],                              
             }])
 
         print("Quizas y solo Quizas esta sea la order_id", id)   

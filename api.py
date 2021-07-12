@@ -1,8 +1,9 @@
 """ views models"""
 import models
-from models.sale_order.venta import saleOrder
+from models.sale_order.venta import saleOrder, sale_order_coinsidencias
 from models.sale_order_line import resources as rs_product
 from models.product.resources import ResProductGet
+from models.crm_team import resources  as rs_crm_team
 from flask import Flask, jsonify, request
 from models import *
 from models import odoo
@@ -70,27 +71,42 @@ def drop_partner(id):
 def create_venta():
     #Usar el metodo ya creado donde creamos un partner
     data = request.get_json()
-    cliente = data["cliente"] 
-    rut = cliente["rut"]
-    partners = rs_partner.ResPartnerGetByID.get_by_rut(rut)
-    if(len(partners)== 0):           
-        crear = rs_partner.ResPartnerCreate.post(cliente)
-        idpatner = crear
-        print("se creo con ", crear)
+
+    coinsidences = rs_crm_team.crm_team_get.get_team(data)
+    if(len(coinsidences) == 0):
+        valor = data['venta']
+        valoresp = valor['name']
+        return "'" + valoresp +"'" + " No existe en la Base de Datos"
     else:
-        first = partners[0]
-        idpatner = first["id"]
-    
-    product = ResProductGet.get_default_code(data)
-    if(len(product)== 0):
-        return"No existe ese Producto"       
-    else:
-        order = data["venta"] 
-        order_id = saleOrder.order_create(order,idpatner)
-        order_line = data["producto"]
-        rs_product.sale_order_line.order_line_create(order_line,order_id)
-    
-    return jsonify({"creado":order_line})
+        value = coinsidences[0]
+        idteam = value['id']
+        get_team_repeticion = sale_order_coinsidencias.get_coinsidencia(data,idteam)
+        if(len(get_team_repeticion) != 0):
+            val = get_team_repeticion[0]
+            idventa = val['name']
+            return "Esa venta ya existe " + idventa
+        else:       
+            cliente = data["cliente"] 
+            rut = cliente["rut"]
+            partners = rs_partner.ResPartnerGetByID.get_by_rut(rut)
+            if(len(partners)== 0):           
+                crear = rs_partner.ResPartnerCreate.post(cliente)
+                idpatner = crear
+                print("se creo con ", crear)
+            else:
+                first = partners[0]
+                idpatner = first["id"]
+            
+            product = ResProductGet.get_default_code(data)
+            if(len(product)== 0):
+                return"No existe ese Producto"       
+            else:
+                order = data["venta"] 
+                order_id = saleOrder.order_create(order,idpatner,idteam)
+                order_line = data["producto"]
+                rs_product.sale_order_line.order_line_create(order_line,order_id)
+            
+            return jsonify({"creado":order_line})
 
 
 

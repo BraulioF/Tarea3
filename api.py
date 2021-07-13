@@ -2,8 +2,9 @@
 import models
 from models.sale_order.venta import saleOrder, sale_order_coinsidencias
 from models.sale_order_line import resources as rs_product
-from models.product.resources import ResProductGet
+from models.product.resources import ProductCategory, ProductCreate, ResProductGet
 from models.crm_team import resources  as rs_crm_team
+from models.product_categoria import resources as rs_pro_cat
 from flask import Flask, jsonify, request
 from models import *
 from models import odoo
@@ -108,6 +109,20 @@ def create_venta():
             
             return jsonify({"creado":order_line})
 
+@app.route("/product/create", methods=["POST"])
+#Enviar a la ruta a traves de postman un json con el name el phone y el email
+def createproduct():
+    #capturo json
+    data = request.get_json()
+    verif = rs_pro_cat.ProductCategory.getCategory(data)
+    product = data["create_prod"]
+    if(len(verif)==0):        
+        val = product["categ_name"]
+        return "No existe la categoria :"+ val
+    
+    crear = ProductCreate.post(product)
+    #y lo mando a su resource
+    return jsonify(verif)
 
 
 if __name__ == "__main__":

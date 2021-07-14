@@ -125,16 +125,23 @@ def createproduct():
     if(len(check)==0):
         val = product["uom_name"]
         return "No existe la unidad de medida :"+ val
-    
+    check_po = rs_uom.UomPoGet.get_uom_po(data)
+    if(len(check_po)==0):
+        val = product["uom_po_name"]
+        return "No existe la unidad de medida :"+ val
+        
     verif = verif[0]
     check = check[0]
+    check_po = check_po[0]
     id_name_categ = verif['id']
     id_display_uom = check['id']
+    id_display_uom_po = check_po['id']
     print(id_name_categ)
     print(id_display_uom)
-    #crear = ProductCreate.post(product,id_name_categ,id_display_uom)
+    print(id_display_uom_po)
+    crear = ProductCreate.post(product,id_name_categ,id_display_uom,id_display_uom_po)
     #y lo mando a su resource
-    return jsonify(verif)
+    return jsonify(crear)
 
 
 if __name__ == "__main__":

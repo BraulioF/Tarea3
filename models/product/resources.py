@@ -10,7 +10,7 @@ class ResProductGet():
                 { 'fields': ['default_code'] ,'limit': 1})
             return parners_details 
 class ProductCreate():
-    def post(data,id_name_categ,id_display_uom):
+    def post(data,id_name_categ,id_display_uom,id_display_uom_po):
         odoo_client = odoo.OdooClient()
         uid, models = odoo_client.logging()
         productid = models.execute_kw(odoo_client.db, uid, odoo_client.password, 'product.product', 'create', 
@@ -20,10 +20,10 @@ class ProductCreate():
             "name":data["name"],
             "barcode":data["barcode"],
             "categ_id":id_name_categ,
-            "ist_price":data["ist_price"],
+            "list_price":data["list_price"],
             "standard_price":data["standard_price"],
             "uom_id":id_display_uom,
-            "uom_po_id":data["uom_po_id"],
+            "uom_po_id":id_display_uom_po,
             "sale_ok":data["sale_ok"],
             "purchase_ok":data["purchase_ok"]
             }])

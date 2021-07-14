@@ -2,10 +2,11 @@
 import models
 from models.sale_order.venta import saleOrder, sale_order_coinsidencias
 from models.sale_order_line import resources as rs_product
-from models.product.resources import ProductCategory, ProductCreate, ResProductGet
+from models.product.resources import ProductCreate, ResProductGet
 from models.crm_team import resources  as rs_crm_team
 from models.product_categoria import resources as rs_pro_cat
 from models.uom import resources as rs_uom
+
 from flask import Flask, jsonify, request
 from models import *
 from models import odoo
@@ -121,8 +122,17 @@ def createproduct():
         val = product["categ_name"]
         return "No existe la categoria :"+ val
     check = rs_uom.UomGet.get_uom(data)
-    print(check)
-    #crear = ProductCreate.post(product)
+    if(len(check)==0):
+        val = product["uom_name"]
+        return "No existe la unidad de medida :"+ val
+    
+    verif = verif[0]
+    check = check[0]
+    id_name_categ = verif['id']
+    id_display_uom = check['id']
+    print(id_name_categ)
+    print(id_display_uom)
+    #crear = ProductCreate.post(product,id_name_categ,id_display_uom)
     #y lo mando a su resource
     return jsonify(verif)
 

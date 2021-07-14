@@ -5,6 +5,7 @@ from models.sale_order_line import resources as rs_product
 from models.product.resources import ProductCategory, ProductCreate, ResProductGet
 from models.crm_team import resources  as rs_crm_team
 from models.product_categoria import resources as rs_pro_cat
+from models.uom import resources as rs_uom
 from flask import Flask, jsonify, request
 from models import *
 from models import odoo
@@ -119,8 +120,9 @@ def createproduct():
     if(len(verif)==0):        
         val = product["categ_name"]
         return "No existe la categoria :"+ val
-    
-    crear = ProductCreate.post(product)
+    check = rs_uom.UomGet.get_uom(data)
+    print(check)
+    #crear = ProductCreate.post(product)
     #y lo mando a su resource
     return jsonify(verif)
 
